@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phân Biệt Màu – Thử Tài Mắt Bạn!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <h1 id="gameTitle">PHÂN BIỆT MÀU <span class="material-icons">visibility</span></h1>
+    <div id="infoBar" class="hidden">
+      <span id="level">Level 1</span>
+      <span id="timer">30s</span>
+    </div>
+    <div id="attempts" class="attempts hidden">
+      <span class="material-icons">favorite</span>
+      <span class="material-icons">favorite</span>
+      <span class="material-icons">favorite</span>
+      <span class="material-icons">favorite</span>
+      <span class="material-icons">favorite</span>
+    </div>
+    <div id="highScore" class="high-score hidden">Kỷ lục: <span id="highestLevel">0</span></div>
+
+    <!-- Game Board -->
+    <div id="gameBoard"></div>
+
+    <!-- Feedback Message -->
+    <div id="feedbackContainer">
+      <p id="feedback"></p>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+      <button id="startButton">BẮT ĐẦU</button>
+      <button id="restartButton" class="hidden">CHƠI LẠI</button>
+    </div>
+  </div>
+
+  <!-- Audio Elements -->
+  <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3"></audio>
+  <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+  <script>
+    const gameBoard = document.getElementById('gameBoard');
+    const levelDisplay = document.getElementById('level');
+    const timerDisplay = document.getElementById('timer');
+    const attemptsDisplay = document.getElementById('attempts');
+    const feedback = document.getElementById('feedback');
+    const feedbackContainer = document.getElementById('feedbackContainer');
+    const startButton = document.getElementById('startButton');
+    const restartButton = document.getElementById('restartButton');
+    const gameTitle = document.getElementById('gameTitle');
+    const infoBar = document.getElementById('infoBar');
+    const highScore = document.getElementById('highScore');
+    const highestLevelDisplay = document.getElementById('highestLevel');
+    const correctSound = document.getElementById('correctSound');
+    const wrongSound = document.getElementById('wrongSound');
+
+    let level = 1;
+    let gridSize = 3;
+    let timeLeft = 30;
+    let wrongAttempts = 0;
+    let timer;
+    let differentTileIndex;
+    let isGameActive = false;
+
+    // Load highest level from local storage
+    let highestLevel = localStorage.getItem('highestLevel') || 0;
+    highestLevelDisplay.textContent = highestLevel;
+
+    // Expanded color pairs: [baseColor, differentColor]
+    const colorPairs = [
+  // Easy (0-40): Noticeable differences in hue or brightness
+  ['#FF0000', '#FF3333'], // Red
+  ['#00AAFF', '#00CCFF'], // Blue
+  ['#FFD700', '#FFEA00'], // Yellow
+  ['#33CC33', '#44DD44'], // Green
+  ['#FF69B4', '#FF85C2'], // Pink
+  ['#8A2BE2', '#9B3EF3'], // Purple
+  ['#FFA500', '#FFB732'], // Orange
+  ['#40E0D0', '#4EEDE0'], // Turquoise
+  ['#FF6F61', '#FF887A'], // Coral
+  ['#4682B4', '#5A93C5'], // Steel Blue
+  ['#9ACD32', '#AEDF43'], // Yellow Green
+  ['#FF4500', '#FF5E1A'], // Orange Red
+  ['#BA55D3', '#C767E0'], // Medium Purple
+  ['#20B2AA', '#2FC3BB'], // Light Sea Green
+  ['#FF1493', '#FF2DA1'], // Deep Pink
+  ['#ADFF2F', '#B9FF47'], // Green Yellow
+  ['#FF6347', '#FF7860'], // Tomato
+  ['#3CB371', '#4AC482'], // Medium Sea Green
+  ['#F08080', '#F49494'], // Light Coral
+  ['#00CED1', '#00DCE0'], // Dark Turquoise
+  ['#9932CC', '#A446D8'], // Dark Orchid
+  ['#FF4500', '#FF5A22'], // Red-Orange
+  ['#1E90FF', '#32A0FF'], // Dodger Blue
+  ['#7CFC00', '#8CFF1A'], // Lawn Green
+  ['#FF00FF', '#FF1AFF'], // Magenta
+  ['#00FF7F', '#1AFF8C'], // Spring Green
+  ['#FFA07A', '#FFB294'], // Light Salmon
+  ['#DA70D6', '#E47AE0'], // Orchid
+  ['#48D1CC', '#54DCD7'], // Medium Turquoise
+  ['#FF8C00', '#FF9A1A'], // Dark Orange
+  ['#00FA9A', '#1AFAA4'], // Medium Spring Green
+  ['#FF4040', '#FF5858'], // Red Light
+  ['#4169E1', '#4F76EA'], // Royal Blue
+  ['#32CD32', '#40D840'], // Lime Green
+  ['#FF83FA', '#FF90FF'], // Light Magenta
+  ['#00FF00', '#1AFF1A'], // Lime
+  ['#FF7F50', '#FF8C64'], // Coral Light
+  ['#9400D3', '#A010E0'], // Dark Violet
+  ['#66CDAA', '#72D7B4'], // Medium Aquamarine
+  ['#FF3030', '#FF4848'], // Scarlet
+
+  // Medium (41-80): Moderate differences, smaller hue or brightness shifts
+  ['#CCCCCC', '#D5D5D5'], // Gray
+  ['#6B7280', '#7C8391'], // Slate
+  ['#E11D48', '#EC3A60'], // Rose
+  ['#4B5563', '#5C6674'], // Gray-dark
+  ['#DC2626', '#E54848'], // Red-dark
+  ['#1E40AF', '#2B56C8'], // Blue-dark
+  ['#15803D', '#22974E'], // Green-dark
+  ['#7E22CE', '#8A3AD6'], // Purple-dark
+  ['#6A5ACD', '#7A6BD8'], // Slate Blue
+  ['#CD853F', '#D49450'], // Peru
+  ['#468284', '#498586'], // Teal
+  ['#FFD1DC', '#FFD3DE'], // Pale Pink
+  ['#B0E0E6', '#B2E2E8'], // Powder Blue
+  ['#8B008B', '#8D028D'], // Dark Magenta
+  ['#5C4033', '#5F4336'], // Dark Brown
+  ['#A9A9A9', '#ABABAB'], // Dark Gray
+  ['#696969', '#6B6B6B'], // Dim Gray
+  ['#E0E0E0', '#E2E2E2'], // Light Gray
+  ['#FFF5EE', '#FFF7F0'], // Seashell
+  ['#F0F8FF', '#F2FAFF'], // Alice Blue
+  ['#FAEBD7', '#FCECDF'], // Antique White
+  ['#FFF0F5', '#FFF2F7'], // Lavender Blush
+  ['#F5F5DC', '#F7F7DE'], // Beige
+  ['#FFE4E1', '#FFE6E3'], // Misty Rose
+  ['#F0FFF0', '#F2FFF2'], // Honeydew
+  ['#DAA520', '#DEA72A'], // Goldenrod
+  ['#FF69B4', '#FF71B8'], // Hot Pink
+  ['#00BFFF', '#0CC2FF'], // Deep Sky Blue
+  ['#228B22', '#2B952B'], // Forest Green
+  ['#FF00FF', '#FF0DFF'], // Fuchsia
+  ['#FFB6C1', '#FFB8C3'], // Light Pink
+  ['#6A5ACD', '#6C5CD0'], // Slate Blue
+  ['#CD5C5C', '#CF5E5E'], // Indian Red
+  ['#20B2AA', '#22B4AC'], // Light Sea Green
+  ['#FF4500', '#FF4702'], // Orange Red
+  ['#9ACD32', '#9CCF34'], // Yellow Green
+  ['#BA55D3', '#BC57D5'], // Medium Purple
+  ['#40E0D0', '#42E2D2'], // Turquoise
+  ['#FF6F61', '#FF7163'], // Coral
+  ['#4682B4', '#4884B6'], // Steel Blue
+
+  // Hard (81-120): Subtle differences, often in similar hues
+  ['#D3D3D3', '#D6D6D6'], // Light Gray
+  ['#4A4E69', '#4D5172'], // Dark Slate
+  ['#E5E5E5', '#E8E8E8'], // Very Light Gray
+  ['#2E2E2E', '#313131'], // Dark Gray
+  ['#F5F5F5', '#F7F7F7'], // Off White
+  ['#DCDCDC', '#DFDFDF'], // Gainsboro
+  ['#708090', '#728192'], // Slate Gray
+  ['#BC8F8F', '#BE9191'], // Rosy Brown
+  ['#483D8B', '#4A3F8D'], // Dark Slate Blue
+  ['#B22222', '#B42424'], // Firebrick
+  ['#191970', '#1B1B72'], // Midnight Blue
+  ['#006400', '#026402'], // Dark Green
+  ['#4B0082', '#4D0084'], // Indigo
+  ['#2F4F4F', '#314F51'], // Dark Slate Gray
+  ['#8B4513', '#8D4515'], // Saddle Brown
+  ['#556B2F', '#576D31'], // Dark Olive Green
+  ['#9932CC', '#9B34CE'], // Dark Orchid
+  ['#8A2BE2', '#8C2DE4'], // Blue Violet
+  ['#C71585', '#C91787'], // Medium Violet Red
+  ['#4682B4', '#4783B5'], // Steel Blue
+  ['#66CDAA', '#67CEAB'], // Medium Aquamarine
+  ['#FF4040', '#FF4141'], // Red Light
+  ['#4169E1', '#426AE2'], // Royal Blue
+  ['#32CD32', '#33CE33'], // Lime Green
+  ['#FF83FA', '#FF84FB'], // Light Magenta
+  ['#00FF00', '#01FF01'], // Lime
+  ['#FF7F50', '#FF8051'], // Coral Light
+  ['#9400D3', '#9500D4'], // Dark Violet
+  ['#48D1CC', '#49D2CD'], // Medium Turquoise
+  ['#FF8C00', '#FF8D01'], // Dark Orange
+  ['#00FA9A', '#01FB9B'], // Medium Spring Green
+  ['#DA70D6', '#DB71D7'], // Orchid
+  ['#FF4500', '#FF4601'], // Orange Red
+  ['#1E90FF', '#1F91FF'], // Dodger Blue
+  ['#7CFC00', '#7DFD01'], // Lawn Green
+  ['#FF00FF', '#FF01FF'], // Magenta
+  ['#00FF7F', '#01FF80'], // Spring Green
+  ['#FFA07A', '#FFA17B'], // Light Salmon
+  ['#228B22', '#238C23'], // Forest Green
+  ['#FF3030', '#FF3131'], // Scarlet
+
+  // Very Hard (121-160): Very subtle differences, often in brightness or saturation
+  ['#F0F0F0', '#F2F2F2'], // Very Light Gray
+  ['#404040', '#424242'], // Dark Gray
+  ['#E8E8E8', '#EAEAEA'], // Light Gray
+  ['#A0A0A0', '#A2A2A2'], // Gray
+  ['#C0C0C0', '#C2C2C2'], // Silver
+  ['#D8D8D8', '#DADADA'], // Light Gray
+  ['#787878', '#7A7A7A'], // Gray
+  ['#B8B8B8', '#BABABA'], // Light Gray
+  ['#585858', '#5A5A5A'], // Dark Gray
+  ['#E0E0E0', '#E1E1E1'], // Light Gray
+  ['#F4F4F4', '#F5F5F5'], // White Smoke
+  ['#383838', '#3A3A3A'], // Very Dark Gray
+  ['#C8C8C8', '#CACACA'], // Light Gray
+  ['#484848', '#4A4A4A'], // Dark Gray
+  ['#D0D0D0', '#D2D2D2'], // Light Gray
+  ['#989898', '#9A9A9A'], // Gray
+  ['#606060', '#626262'], // Dark Gray
+  ['#E4E4E4', '#E6E6E6'], // Light Gray
+  ['#A8A8A8', '#AAAAAA'], // Gray
+  ['#707070', '#727272'], // Gray
+  ['#F8F8F8', '#FAFAFA'], // Snow
+  ['#505050', '#525252'], // Dark Gray
+  ['#CCCCCC', '#CDCDCD'], // Light Gray
+  ['#909090', '#929292'], // Gray
+  ['#686868', '#6A6A6A'], // Dark Gray
+  ['#DCDCDC', '#DEDEDE'], // Gainsboro
+  ['#B0B0B0', '#B2B2B2'], // Light Gray
+  ['#787878', '#797979'], // Gray
+  ['#E8E8E8', '#E9E9E9'], // Light Gray
+  ['#404040', '#414141'], // Dark Gray
+  ['#F0F0F0', '#F1F1F1'], // Light Gray
+  ['#A0A0A0', '#A1A1A1'], // Gray
+  ['#C0C0C0', '#C1C1C1'], // Silver
+  ['#D8D8D8', '#D9D9D9'], // Light Gray
+  ['#585858', '#595959'], // Dark Gray
+  ['#E0E0E0', '#E1E1E1'], // Light Gray
+  ['#F4F4F4', '#F5F5F5'], // White Smoke
+  ['#383838', '#393939'], // Very Dark Gray
+  ['#C8C8C8', '#C9C9C9'], // Light Gray
+  ['#484848', '#494949'], // Dark Gray
+
+  // Extremely Hard (161-200): Extremely subtle differences, almost indistinguishable
+  ['#F0F0F0', '#F0F0F1'], // Light Gray
+  ['#E0E0E0', '#E0E0E1'], // Light Gray
+  ['#D0D0D0', '#D0D0D1'], // Light Gray
+  ['#C0C0C0', '#C0C0C1'], // Silver
+  ['#B0B0B0', '#B0B0B1'], // Light Gray
+  ['#A0A0A0', '#A0A0A1'], // Gray
+  ['#909090', '#909091'], // Gray
+  ['#808080', '#808081'], // Gray
+  ['#707070', '#707071'], // Gray
+  ['#606060', '#606061'], // Dark Gray
+  ['#505050', '#505051'], // Dark Gray
+  ['#404040', '#404041'], // Dark Gray
+  ['#303030', '#303031'], // Very Dark Gray
+  ['#202020', '#202021'], // Very Dark Gray
+  ['#101010', '#101011'], // Almost Black
+  ['#F8F8F8', '#F8F8F9'], // Snow
+  ['#F6F6F6', '#F6F6F7'], // Snow
+  ['#F4F4F4', '#F4F4F5'], // White Smoke
+  ['#F2F2F2', '#F2F2F3'], // Light Gray
+  ['#EEEEEE', '#EEEEEF'], // Light Gray
+  ['#ECECEC', '#ECECED'], // Light Gray
+  ['#EAEAEA', '#EAEAEB'], // Light Gray
+  ['#E8E8E8', '#E8E8E9'], // Light Gray
+  ['#E6E6E6', '#E6E6E7'], // Light Gray
+  ['#E4E4E4', '#E4E4E5'], // Light Gray
+  ['#E2E2E2', '#E2E2E3'], // Light Gray
+  ['#E0E0E0', '#E0E0E1'], // Light Gray
+  ['#DEDEDE', '#DEDEDF'], // Gainsboro
+  ['#DCDCDC', '#DCDCDD'], // Gainsboro
+  ['#DADADA', '#DADADB'], // Light Gray
+  ['#D8D8D8', '#D8D8D9'], // Light Gray
+  ['#D6D6D6', '#D6D6D7'], // Light Gray
+  ['#D4D4D4', '#D4D4D5'], // Light Gray
+  ['#D2D2D2', '#D2D2D3'], // Light Gray
+  ['#D0D0D0', '#D0D0D1'], // Light Gray
+  ['#CECECE', '#CECECF'], // Light Gray
+  ['#CCCCCC', '#CCCCCD'], // Light Gray
+  ['#CACACA', '#CACACB'], // Light Gray
+  ['#C8C8C8', '#C8C8C9'], // Light Gray
+  ['#C6C6C6', '#C6C6C7']  // Light Gray
+];
+
+    startButton.addEventListener('click', startGame);
+    restartButton.addEventListener('click', startGame);
+
+    function startGame() {
+      isGameActive = true;
+      level = 1;
+      gridSize = 3;
+      timeLeft = 30;
+      wrongAttempts = 0;
+      updateAttemptsDisplay();
+      feedback.textContent = '';
+      feedbackContainer.className = 'text-center mt-4 sm:mt-6 flex justify-center items-center';
+      gameTitle.classList.add('hidden');
+      infoBar.classList.remove('hidden');
+      attemptsDisplay.classList.remove('hidden');
+      highScore.classList.remove('hidden');
+      startButton.classList.add('hidden');
+      restartButton.classList.add('hidden');
+      initializeBoard();
+      startTimer();
+    }
+
+    function initializeBoard() {
+      gameBoard.innerHTML = '';
+      levelDisplay.textContent = `Level ${level}`;
+      timerDisplay.textContent = `${timeLeft}s`;
+
+      // Adjust grid size based on level
+      if (level >= 5) gridSize = 4;
+      if (level >= 8) gridSize = 5;
+      if (level >= 12) gridSize = 6;
+      if (level >= 15) gridSize = 7;
+
+      // Set grid columns and dynamic styling
+      gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, minmax(0, 1fr))`;
+      gameBoard.style.padding = '16px';
+      gameBoard.style.boxSizing = 'border-box';
+
+      // Dynamic tile size and gap based on grid size (larger on desktop)
+      let tileSize = { width: '128px', height: '128px' }; // Default for 3x3 (desktop)
+      let gap = '5px';
+      if (gridSize === 4) {
+        tileSize = { width: '112px', height: '112px' };
+        gap = '5px';
+      } else if (gridSize === 5) {
+        tileSize = { width: '96px', height: '96px' };
+        gap = '4px';
+      } else if (gridSize === 6) {
+        tileSize = { width: '80px', height: '80px' };
+        gap = '3px';
+      } else if (gridSize >= 7) {
+        tileSize = { width: '64px', height: '64px' };
+        gap = '3px';
+      }
+
+      // Adjust for mobile (smaller tiles)
+      if (window.innerWidth <= 640) {
+        tileSize = { width: '60px', height: '60px' };
+        if (gridSize === 4) {
+          tileSize = { width: '52px', height: '52px' };
+          gap = '4px';
+        } else if (gridSize === 5) {
+          tileSize = { width: '44px', height: '44px' };
+          gap = '3px';
+        } else if (gridSize === 6) {
+          tileSize = { width: '36px', height: '36px' };
+          gap = '2px';
+        } else if (gridSize >= 7) {
+          tileSize = { width: '32px', height: '32px' };
+          gap = '2px';
+        }
+      }
+
+      gameBoard.style.gap = gap;
+
+      // Calculate grid width to ensure centering
+      const tileWidth = parseInt(tileSize.width);
+      const totalGapWidth = (gridSize - 1) * parseInt(gap);
+      const gridWidth = (tileWidth * gridSize) + totalGapWidth + 32; // 32px for padding
+      gameBoard.style.width = `${gridWidth}px`;
+      gameBoard.style.margin = '0 auto';
+
+      // Select color pair (easier colors for levels 1-5)
+      const availableColors = level <= 5 ? colorPairs.slice(0, 16) : colorPairs;
+      const colorPair = availableColors[Math.floor(Math.random() * availableColors.length)];
+      const baseColor = colorPair[0];
+      const differentColor = colorPair[1];
+
+      // Determine different tile
+      differentTileIndex = Math.floor(Math.random() * gridSize * gridSize);
+
+      // Create tiles
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.style.width = tileSize.width;
+        tile.style.height = tileSize.height;
+        tile.style.backgroundColor = i === differentTileIndex ? differentColor : baseColor;
+        tile.addEventListener('click', () => handleTileClick(i));
+        gameBoard.appendChild(tile);
+      }
+    }
+
+    function updateAttemptsDisplay() {
+      const remainingAttempts = 5 - wrongAttempts;
+      attemptsDisplay.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'material-icons';
+        heart.textContent = i < remainingAttempts ? 'favorite' : 'favorite_border';
+        attemptsDisplay.appendChild(heart);
+      }
+    }
+
+    function handleTileClick(index) {
+      if (!isGameActive) return;
+
+      if (index === differentTileIndex) {
+        correctSound.play();
+        feedback.innerHTML = '<span class="material-icons">check_circle</span> ĐÚNG RỒI!';
+        feedback.className = 'drop-shadow-md';
+        feedbackContainer.className = 'feedback-success';
+        wrongAttempts = 0;
+        updateAttemptsDisplay();
+        isGameActive = false;
+        clearInterval(timer);
+        const tiles = gameBoard.children;
+        tiles[differentTileIndex].classList.add('animate-bounce');
+        setTimeout(() => {
+          level++;
+          if (level - 1 > highestLevel) {
+            highestLevel = level - 1;
+            localStorage.setItem('highestLevel', highestLevel);
+            highestLevelDisplay.textContent = highestLevel;
+          }
+          timeLeft = 30;
+          initializeBoard();
+          startTimer();
+          feedback.textContent = '';
+          feedbackContainer.className = 'text-center mt-4 sm:mt-6 flex justify-center items-center';
+          isGameActive = true;
+        }, 1000);
+      } else {
+        wrongSound.play();
+        wrongAttempts++;
+        updateAttemptsDisplay();
+        if (wrongAttempts >= 5) {
+          clearInterval(timer);
+          isGameActive = false;
+          feedback.innerHTML = '<span class="material-icons">error</span> SAI QUÁ 5 LẦN!';
+          feedback.className = 'drop-shadow-md';
+          feedbackContainer.className = 'feedback-error';
+          const tiles = gameBoard.children;
+          tiles[differentTileIndex].classList.add('highlight-different');
+          restartButton.classList.remove('hidden');
+          return;
+        }
+        feedback.innerHTML = '<span class="material-icons">cancel</span> SAI RỒI!';
+        feedback.className = 'drop-shadow-md';
+        feedbackContainer.className = 'feedback-error';
+        const tile = gameBoard.children[index];
+        tile.classList.add('animate-shake');
+        tile.style.backgroundColor = '#ef4444';
+        setTimeout(() => {
+          tile.classList.remove('animate-shake');
+          tile.style.backgroundColor = gameBoard.children[0].style.backgroundColor;
+        }, 500);
+      }
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          isGameActive = false;
+          feedback.innerHTML = '<span class="material-icons">timer_off</span> HẾT GIỜ!';
+          feedback.className = 'drop-shadow-md';
+          feedbackContainer.className = 'feedback-error';
+          const tiles = gameBoard.children;
+          tiles[differentTileIndex].classList.add('highlight-different');
+          restartButton.classList.remove('hidden');
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
