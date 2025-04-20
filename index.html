@@ -72,9 +72,9 @@
     let highestLevel = localStorage.getItem('highestLevel') || 0;
     highestLevelDisplay.textContent = highestLevel;
 
-    // Expanded color pairs: [baseColor, differentColor]
-    const colorPairs = [
-  // Easy (0-40): Noticeable differences in hue or brightness
+    // Color pairs split into 5 difficulty levels
+    const easyColors = [
+  // 40 cặp màu ban đầu (giữ nguyên)
   ['#FF0000', '#FF3333'], // Red
   ['#00AAFF', '#00CCFF'], // Blue
   ['#FFD700', '#FFEA00'], // Yellow
@@ -116,174 +116,577 @@
   ['#66CDAA', '#72D7B4'], // Medium Aquamarine
   ['#FF3030', '#FF4848'], // Scarlet
 
-  // Medium (41-80): Moderate differences, smaller hue or brightness shifts
-  ['#CCCCCC', '#D5D5D5'], // Gray
-  ['#6B7280', '#7C8391'], // Slate
-  ['#E11D48', '#EC3A60'], // Rose
-  ['#4B5563', '#5C6674'], // Gray-dark
-  ['#DC2626', '#E54848'], // Red-dark
-  ['#1E40AF', '#2B56C8'], // Blue-dark
-  ['#15803D', '#22974E'], // Green-dark
-  ['#7E22CE', '#8A3AD6'], // Purple-dark
-  ['#6A5ACD', '#7A6BD8'], // Slate Blue
-  ['#CD853F', '#D49450'], // Peru
-  ['#468284', '#498586'], // Teal
-  ['#FFD1DC', '#FFD3DE'], // Pale Pink
-  ['#B0E0E6', '#B2E2E8'], // Powder Blue
-  ['#8B008B', '#8D028D'], // Dark Magenta
-  ['#5C4033', '#5F4336'], // Dark Brown
-  ['#A9A9A9', '#ABABAB'], // Dark Gray
-  ['#696969', '#6B6B6B'], // Dim Gray
-  ['#E0E0E0', '#E2E2E2'], // Light Gray
-  ['#FFF5EE', '#FFF7F0'], // Seashell
-  ['#F0F8FF', '#F2FAFF'], // Alice Blue
-  ['#FAEBD7', '#FCECDF'], // Antique White
-  ['#FFF0F5', '#FFF2F7'], // Lavender Blush
-  ['#F5F5DC', '#F7F7DE'], // Beige
-  ['#FFE4E1', '#FFE6E3'], // Misty Rose
-  ['#F0FFF0', '#F2FFF2'], // Honeydew
-  ['#DAA520', '#DEA72A'], // Goldenrod
-  ['#FF69B4', '#FF71B8'], // Hot Pink
-  ['#00BFFF', '#0CC2FF'], // Deep Sky Blue
-  ['#228B22', '#2B952B'], // Forest Green
-  ['#FF00FF', '#FF0DFF'], // Fuchsia
-  ['#FFB6C1', '#FFB8C3'], // Light Pink
-  ['#6A5ACD', '#6C5CD0'], // Slate Blue
-  ['#CD5C5C', '#CF5E5E'], // Indian Red
-  ['#20B2AA', '#22B4AC'], // Light Sea Green
-  ['#FF4500', '#FF4702'], // Orange Red
-  ['#9ACD32', '#9CCF34'], // Yellow Green
-  ['#BA55D3', '#BC57D5'], // Medium Purple
-  ['#40E0D0', '#42E2D2'], // Turquoise
-  ['#FF6F61', '#FF7163'], // Coral
-  ['#4682B4', '#4884B6'], // Steel Blue
-
-  // Hard (81-120): Subtle differences, often in similar hues
-  ['#D3D3D3', '#D6D6D6'], // Light Gray
-  ['#4A4E69', '#4D5172'], // Dark Slate
-  ['#E5E5E5', '#E8E8E8'], // Very Light Gray
-  ['#2E2E2E', '#313131'], // Dark Gray
-  ['#F5F5F5', '#F7F7F7'], // Off White
-  ['#DCDCDC', '#DFDFDF'], // Gainsboro
-  ['#708090', '#728192'], // Slate Gray
-  ['#BC8F8F', '#BE9191'], // Rosy Brown
-  ['#483D8B', '#4A3F8D'], // Dark Slate Blue
-  ['#B22222', '#B42424'], // Firebrick
-  ['#191970', '#1B1B72'], // Midnight Blue
-  ['#006400', '#026402'], // Dark Green
-  ['#4B0082', '#4D0084'], // Indigo
-  ['#2F4F4F', '#314F51'], // Dark Slate Gray
-  ['#8B4513', '#8D4515'], // Saddle Brown
-  ['#556B2F', '#576D31'], // Dark Olive Green
-  ['#9932CC', '#9B34CE'], // Dark Orchid
-  ['#8A2BE2', '#8C2DE4'], // Blue Violet
-  ['#C71585', '#C91787'], // Medium Violet Red
-  ['#4682B4', '#4783B5'], // Steel Blue
-  ['#66CDAA', '#67CEAB'], // Medium Aquamarine
-  ['#FF4040', '#FF4141'], // Red Light
-  ['#4169E1', '#426AE2'], // Royal Blue
-  ['#32CD32', '#33CE33'], // Lime Green
-  ['#FF83FA', '#FF84FB'], // Light Magenta
-  ['#00FF00', '#01FF01'], // Lime
-  ['#FF7F50', '#FF8051'], // Coral Light
-  ['#9400D3', '#9500D4'], // Dark Violet
-  ['#48D1CC', '#49D2CD'], // Medium Turquoise
-  ['#FF8C00', '#FF8D01'], // Dark Orange
-  ['#00FA9A', '#01FB9B'], // Medium Spring Green
-  ['#DA70D6', '#DB71D7'], // Orchid
-  ['#FF4500', '#FF4601'], // Orange Red
-  ['#1E90FF', '#1F91FF'], // Dodger Blue
-  ['#7CFC00', '#7DFD01'], // Lawn Green
-  ['#FF00FF', '#FF01FF'], // Magenta
-  ['#00FF7F', '#01FF80'], // Spring Green
-  ['#FFA07A', '#FFA17B'], // Light Salmon
-  ['#228B22', '#238C23'], // Forest Green
-  ['#FF3030', '#FF3131'], // Scarlet
-
-  // Very Hard (121-160): Very subtle differences, often in brightness or saturation
-  ['#F0F0F0', '#F2F2F2'], // Very Light Gray
-  ['#404040', '#424242'], // Dark Gray
-  ['#E8E8E8', '#EAEAEA'], // Light Gray
-  ['#A0A0A0', '#A2A2A2'], // Gray
-  ['#C0C0C0', '#C2C2C2'], // Silver
-  ['#D8D8D8', '#DADADA'], // Light Gray
-  ['#787878', '#7A7A7A'], // Gray
-  ['#B8B8B8', '#BABABA'], // Light Gray
-  ['#585858', '#5A5A5A'], // Dark Gray
-  ['#E0E0E0', '#E1E1E1'], // Light Gray
-  ['#F4F4F4', '#F5F5F5'], // White Smoke
-  ['#383838', '#3A3A3A'], // Very Dark Gray
-  ['#C8C8C8', '#CACACA'], // Light Gray
-  ['#484848', '#4A4A4A'], // Dark Gray
-  ['#D0D0D0', '#D2D2D2'], // Light Gray
-  ['#989898', '#9A9A9A'], // Gray
-  ['#606060', '#626262'], // Dark Gray
-  ['#E4E4E4', '#E6E6E6'], // Light Gray
-  ['#A8A8A8', '#AAAAAA'], // Gray
-  ['#707070', '#727272'], // Gray
-  ['#F8F8F8', '#FAFAFA'], // Snow
-  ['#505050', '#525252'], // Dark Gray
-  ['#CCCCCC', '#CDCDCD'], // Light Gray
-  ['#909090', '#929292'], // Gray
-  ['#686868', '#6A6A6A'], // Dark Gray
-  ['#DCDCDC', '#DEDEDE'], // Gainsboro
-  ['#B0B0B0', '#B2B2B2'], // Light Gray
-  ['#787878', '#797979'], // Gray
-  ['#E8E8E8', '#E9E9E9'], // Light Gray
-  ['#404040', '#414141'], // Dark Gray
-  ['#F0F0F0', '#F1F1F1'], // Light Gray
-  ['#A0A0A0', '#A1A1A1'], // Gray
-  ['#C0C0C0', '#C1C1C1'], // Silver
-  ['#D8D8D8', '#D9D9D9'], // Light Gray
-  ['#585858', '#595959'], // Dark Gray
-  ['#E0E0E0', '#E1E1E1'], // Light Gray
-  ['#F4F4F4', '#F5F5F5'], // White Smoke
-  ['#383838', '#393939'], // Very Dark Gray
-  ['#C8C8C8', '#C9C9C9'], // Light Gray
-  ['#484848', '#494949'], // Dark Gray
-
-  // Extremely Hard (161-200): Extremely subtle differences, almost indistinguishable
-  ['#F0F0F0', '#F0F0F1'], // Light Gray
-  ['#E0E0E0', '#E0E0E1'], // Light Gray
-  ['#D0D0D0', '#D0D0D1'], // Light Gray
-  ['#C0C0C0', '#C0C0C1'], // Silver
-  ['#B0B0B0', '#B0B0B1'], // Light Gray
-  ['#A0A0A0', '#A0A0A1'], // Gray
-  ['#909090', '#909091'], // Gray
-  ['#808080', '#808081'], // Gray
-  ['#707070', '#707071'], // Gray
-  ['#606060', '#606061'], // Dark Gray
-  ['#505050', '#505051'], // Dark Gray
-  ['#404040', '#404041'], // Dark Gray
-  ['#303030', '#303031'], // Very Dark Gray
-  ['#202020', '#202021'], // Very Dark Gray
-  ['#101010', '#101011'], // Almost Black
-  ['#F8F8F8', '#F8F8F9'], // Snow
-  ['#F6F6F6', '#F6F6F7'], // Snow
-  ['#F4F4F4', '#F4F4F5'], // White Smoke
-  ['#F2F2F2', '#F2F2F3'], // Light Gray
-  ['#EEEEEE', '#EEEEEF'], // Light Gray
-  ['#ECECEC', '#ECECED'], // Light Gray
-  ['#EAEAEA', '#EAEAEB'], // Light Gray
-  ['#E8E8E8', '#E8E8E9'], // Light Gray
-  ['#E6E6E6', '#E6E6E7'], // Light Gray
-  ['#E4E4E4', '#E4E4E5'], // Light Gray
-  ['#E2E2E2', '#E2E2E3'], // Light Gray
-  ['#E0E0E0', '#E0E0E1'], // Light Gray
-  ['#DEDEDE', '#DEDEDF'], // Gainsboro
-  ['#DCDCDC', '#DCDCDD'], // Gainsboro
-  ['#DADADA', '#DADADB'], // Light Gray
-  ['#D8D8D8', '#D8D8D9'], // Light Gray
-  ['#D6D6D6', '#D6D6D7'], // Light Gray
-  ['#D4D4D4', '#D4D4D5'], // Light Gray
-  ['#D2D2D2', '#D2D2D3'], // Light Gray
-  ['#D0D0D0', '#D0D0D1'], // Light Gray
-  ['#CECECE', '#CECECF'], // Light Gray
-  ['#CCCCCC', '#CCCCCD'], // Light Gray
-  ['#CACACA', '#CACACB'], // Light Gray
-  ['#C8C8C8', '#C8C8C9'], // Light Gray
-  ['#C6C6C6', '#C6C6C7']  // Light Gray
+  // 100 cặp màu mới (cấp độ dễ)
+  ['#FF5555', '#FF7777'], // Light Red
+  ['#00FFAA', '#33FFBB'], // Bright Green
+  ['#FFFF00', '#FFFF66'], // Bright Yellow
+  ['#00FFFF', '#66FFFF'], // Cyan
+  ['#FF99CC', '#FFBBDD'], // Soft Pink
+  ['#AA00FF', '#BB33FF'], // Bright Purple
+  ['#FFAA00', '#FFCC33'], // Light Orange
+  ['#00DDFF', '#33EEFF'], // Sky Blue
+  ['#FF9966', '#FFBB88'], // Peach
+  ['#3399FF', '#55AAFF'], // Light Blue
+  ['#CCFF00', '#DDFF33'], // Neon Yellow
+  ['#FF6600', '#FF8833'], // Bright Orange
+  ['#CC33FF', '#DD55FF'], // Violet
+  ['#00CC99', '#33DDBB'], // Teal
+  ['#FF3399', '#FF55AA'], // Hot Pink
+  ['#99FF33', '#AAFF55'], // Lime Green
+  ['#FF7755', '#FF9988'], // Salmon
+  ['#33CC66', '#55DD88'], // Forest Green
+  ['#FFBBBB', '#FFDDDD'], // Pale Pink
+  ['#00BBBB', '#33CCCC'], // Aqua
+  ['#AA55FF', '#BB77FF'], // Lavender
+  ['#FF5500', '#FF7733'], // Tangerine
+  ['#00AAEE', '#33BBFF'], // Ocean Blue
+  ['#99FF66', '#AAFF88'], // Spring Green
+  ['#FF00CC', '#FF33DD'], // Bright Magenta
+  ['#00FFCC', '#33FFDD'], // Mint
+  ['#FFCC99', '#FFDDBB'], // Apricot
+  ['#CC66FF', '#DD88FF'], // Lilac
+  ['#33CCCC', '#55DDDD'], // Turquoise Light
+  ['#FFAA55', '#FFCC77'], // Coral Orange
+  ['#00FF99', '#33FFBB'], // Sea Green
+  ['#FF66AA', '#FF88BB'], // Bubblegum Pink
+  ['#3366FF', '#5588FF'], // Cobalt Blue
+  ['#66FF33', '#88FF55'], // Chartreuse
+  ['#FF99FF', '#FFBBFF'], // Pale Magenta
+  ['#00CC00', '#33DD33'], // Kelly Green
+  ['#FF8866', '#FFAA88'], // Coral Red
+  ['#AA00AA', '#BB33BB'], // Deep Purple
+  ['#33FFCC', '#55FFDD'], // Aquamarine
+  ['#FF4444', '#FF6666'], // Crimson
+  ['#00FF55', '#33FF77'], // Neon Green
+  ['#FFFF55', '#FFFF88'], // Lemon Yellow
+  ['#00CCFF', '#33DDFF'], // Bright Cyan
+  ['#FFCCFF', '#FFDDFD'], // Pale Lavender
+  ['#BB33EE', '#CC55FF'], // Electric Purple
+  ['#FFBB00', '#FFCC44'], // Golden Orange
+  ['#00EECC', '#33FFDD'], // Light Teal
+  ['#FFAA77', '#FFCC99'], // Peach Coral
+  ['#55AAFF', '#77BBFF'], // Soft Blue
+  ['#CCFF55', '#DDFF77'], // Light Chartreuse
+  ['#FF7744', '#FF9955'], // Mandarin
+  ['#CC55EE', '#DD77FF'], // Bright Violet
+  ['#33EEAA', '#55FFBB'], // Mint Green
+  ['#FF55BB', '#FF77CC'], // Candy Pink
+  ['#AAFF33', '#BBFF55'], // Neon Lime
+  ['#FFAA99', '#FFCCBB'], // Soft Coral
+  ['#55CC66', '#77DD88'], // Emerald
+  ['#FFDDCC', '#FFEEDE'], // Pale Peach
+  ['#33AADD', '#55BBEE'], // Light Ocean
+  ['#BB55FF', '#CC77FF'], // Soft Violet
+  ['#FF3366', '#FF5588'], // Rose Pink
+  ['#55FF99', '#77FFBB'], // Light Mint
+  ['#FFCC00', '#FFDD33'], // Sunflower
+  ['#33CCFF', '#55DDFF'], // Sky Cyan
+  ['#FF99AA', '#FFBBCC'], // Blush Pink
+  ['#AA66FF', '#BB88FF'], // Pastel Purple
+  ['#FFBB77', '#FFCC99'], // Light Peach
+  ['#00FFDD', '#33FFEE'], // Bright Aqua
+  ['#CCFF99', '#DDFFBB'], // Pale Green
+  ['#FF6655', '#FF8877'], // Soft Red
+  ['#66FF66', '#88FF88'], // Bright Green
+  ['#FFFF99', '#FFFFBB'], // Pale Yellow
+  ['#00AACC', '#33BBDD'], // Ocean Cyan
+  ['#FFBBDD', '#FFDDEE'], // Light Pink
+  ['#CC33CC', '#DD55DD'], // Bright Magenta
+  ['#FFCC66', '#FFDD88'], // Gold
+  ['#33DDCC', '#55EEDD'], // Light Turquoise
+  ['#FF9966', '#FFBB88'], // Coral Peach
+  ['#66AAFF', '#88BBFF'], // Light Cobalt
+  ['#AAFF77', '#BBFF99'], // Light Lime
+  ['#FF5577', '#FF7799'], // Strawberry
+  ['#CC66AA', '#DD88BB'], // Mauve
+  ['#33FFAA', '#55FFCC'], // Teal Green
+  ['#FFAA44', '#FFCC66'], // Orange Yellow
+  ['#66FFCC', '#88FFDD'], // Pale Aqua
+  ['#FF77AA', '#FF99CC'], // Soft Pink
+  ['#9966FF', '#BB88FF'], // Light Purple
+  ['#FFCC88', '#FFDDA9'], // Warm Peach
+  ['#00CCAA', '#33DDBB'], // Seafoam
+  ['#CCFFAA', '#DDFFCC'], // Minty Green
+  ['#FF6644', '#FF8866'], // Red Coral
+  ['#55FF55', '#77FF77'], // Bright Lime
+  ['#FFFFAA', '#FFFFCC'], // Soft Yellow
+  ['#00BBEE', '#33CCFF'], // Bright Blue
+  ['#FFCCEE', '#FFDDFD'], // Pale Lilac
+  ['#BB44FF', '#CC66FF'], // Neon Purple
+  ['#FFAA88', '#FFCCAA'], // Peach Orange
+  ['#33EEBB', '#55FFCC']  // Light Seafoam
 ];
+
+    const mediumColors = [
+      ['#CCCCCC', '#D5D5D5'], ['#6B7280', '#7C8391'], ['#E11D48', '#EC3A60'],
+      ['#4B5563', '#5C6674'], ['#DC2626', '#E54848'], ['#1E40AF', '#2B56C8'],
+      ['#15803D', '#22974E'], ['#7E22CE', '#8A3AD6'], ['#6A5ACD', '#7A6BD8'],
+      ['#CD853F', '#D49450'], ['#468284', '#498586'], ['#FFD1DC', '#FFD3DE'],
+      ['#B0E0E6', '#B2E2E8'], ['#8B008B', '#8D028D'], ['#5C4033', '#5F4336'],
+      ['#A9A9A9', '#ABABAB'], ['#696969', '#6B6B6B'], ['#E0E0E0', '#E2E2E2'],
+      ['#FFF5EE', '#FFF7F0'], ['#F0F8FF', '#F2FAFF'], ['#FAEBD7', '#FCECDF'],
+      ['#FFF0F5', '#FFF2F7'], ['#F5F5DC', '#F7F7DE'], ['#FFE4E1', '#FFE6E3'],
+      ['#F0FFF0', '#F2FFF2'], ['#DAA520', '#DEA72A'], ['#FF69B4', '#FF71B8'],
+      ['#00BFFF', '#0CC2FF'], ['#228B22', '#2B952B'], ['#FF00FF', '#FF0DFF'],
+      ['#FFB6C1', '#FFB8C3'], ['#6A5ACD', '#6C5CD0'], ['#CD5C5C', '#CF5E5E'],
+      ['#20B2AA', '#22B4AC'], ['#FF4500', '#FF4702'], ['#9ACD32', '#9CCF34'],
+      ['#BA55D3', '#BC57D5'], ['#40E0D0', '#42E2D2'], ['#FF6F61', '#FF7163'],
+      ['#4682B4', '#4884B6'],['#B0BEC5', '#C4CED3'], // Light Blue Gray
+  ['#EF5350', '#F27573'], // Soft Red
+  ['#4CAF50', '#5EC062'], // Medium Green
+  ['#AB47BC', '#B959CA'], // Soft Purple
+  ['#42A5F5', '#54B5F7'], // Bright Blue
+  ['#FFCA28', '#FFD54F'], // Amber
+  ['#26C6DA', '#38D6EA'], // Cyan
+  ['#F06292', '#F374A0'], // Light Magenta
+  ['#78909C', '#8A9FA8'], // Grayish Cyan
+  ['#A1887F', '#B39A91'], // Brownish Gray
+  ['#66BB6A', '#78CB7C'], // Light Green
+  ['#FF8A65', '#FF9C77'], // Coral Orange
+  ['#5C6BC0', '#6E7DD2'], // Indigo
+  ['#D4E157', '#D8E569'], // Light Lime
+  ['#FFAB91', '#FFBDA3'], // Peach
+  ['#90A4AE', '#A2B6C0'], // Light Steel Blue
+  ['#FBC02D', '#FFCA4F'], // Yellow
+  ['#29B6F6', '#3BC6F8'], // Sky Blue
+  ['#EC407A', '#F0528C'], // Pink
+  ['#8D6E63', '#9F8075'], // Brown
+  ['#4DD0E1', '#5FE0F1'], // Light Cyan
+  ['#FFA726', '#FFB938'], // Orange
+  ['#7CB342', '#8EC354'], // Olive Green
+  ['#F06292', '#F274A4'], // Soft Magenta
+  ['#90CAF9', '#A2DAFB'], // Pale Blue
+  ['#FF8A80', '#FF9C92'], // Salmon
+  ['#26A69A', '#38B6AA'], // Teal Green
+  ['#EF9A9A', '#F1ACAC'], // Light Coral
+  ['#9FA8DA', '#B1BADA'], // Light Indigo
+  ['#FFCC80', '#FFDE92'], // Light Orange
+  ['#66BB6A', '#78CB7C'], // Medium Green
+  ['#AB47BC', '#BD59CE'], // Medium Purple
+  ['#4FC3F7', '#61D3F9'], // Bright Cyan
+  ['#FF8A65', '#FF9C77'], // Coral
+  ['#78909C', '#8AA0AE'], // Grayish Blue
+  ['#D4E157', '#D6E369'], // Light Yellow Green
+  ['#F06292', '#F274A4'], // Pinkish Magenta
+  ['#90A4AE', '#A2B4C0'], // Pale Steel Blue
+  ['#FFCA28', '#FFDC4A'], // Bright Yellow
+  ['#29B6F6', '#3BC6F8'], // Light Blue
+  ['#EC407A', '#EE529C'], // Bright Pink
+  ['#8D6E63', '#9F8075'], // Soft Brown
+  ['#4DD0E1', '#5FE0F3'], // Cyan
+  ['#FFA726', '#FFB938'], // Soft Orange
+  ['#7CB342', '#8EC354'], // Light Olive
+  ['#F06292', '#F274A4'], // Light Pink
+  ['#90CAF9', '#A2DAFB'], // Pale Sky Blue
+  ['#FF8A80', '#FF9C92'], // Light Salmon
+  ['#26A69A', '#38B6AA'], // Medium Teal
+  ['#EF9A9A', '#F1ACAC'], // Pale Coral
+  ['#9FA8DA', '#B1BADA'], // Light Purple
+  ['#FFCC80', '#FFDE92'], // Pale Orange
+  ['#66BB6A', '#78CB7C'], // Soft Green
+  ['#AB47BC', '#BD59CE'], // Soft Violet
+  ['#4FC3F7', '#61D3F9'], // Light Cyan
+  ['#FF8A65', '#FF9C77'], // Peach Coral
+  ['#78909C', '#8AA0AE'], // Light Grayish Blue
+  ['#D4E157', '#D6E369'], // Pale Lime
+  ['#F06292', '#F274A4'], // Soft Magenta
+  ['#90A4AE', '#A2B4C0'], // Light Blue Gray
+  ['#FFCA28', '#FFDC4A'], // Soft Yellow
+  ['#29B6F6', '#3BC6F8'], // Pale Blue
+  ['#EC407A', '#EE529C'], // Medium Pink
+  ['#8D6E63', '#9F8075'], // Light Brown
+  ['#4DD0E1', '#5FE0F3'], // Light Teal
+  ['#FFA726', '#FFB938'], // Medium Orange
+  ['#7CB342', '#8EC354'], // Medium Green
+  ['#F06292', '#F274A4'], // Pale Magenta
+  ['#90CAF9', '#A2DAFB'], // Light Sky Blue
+  ['#FF8A80', '#FF9C92'], // Soft Coral
+  ['#26A69A', '#38B6AA'], // Light Teal
+  ['#EF9A9A', '#F1ACAC'], // Light Red
+  ['#9FA8DA', '#B1BADA'], // Pale Indigo
+  ['#FFCC80', '#FFDE92'], // Soft Peach
+  ['#66BB6A', '#78CB7C'], // Light Forest Green
+  ['#AB47BC', '#BD59CE'], // Medium Violet
+  ['#4FC3F7', '#61D3F9'], // Bright Blue
+  ['#FF8A65', '#FF9C77'], // Coral Light
+  ['#78909C', '#8AA0AE'], // Grayish Cyan
+  ['#D4E157', '#D6E369'], // Light Chartreuse
+  ['#F06292', '#F274A4'], // Medium Magenta
+  ['#90A4AE', '#A2B4C0'], // Pale Cyan
+  ['#FFCA28', '#FFDC4A'], // Medium Yellow
+  ['#29B6F6', '#3BC6F8'], // Soft Sky Blue
+  ['#EC407A', '#EE529C'], // Soft Pink
+  ['#8D6E63', '#9F8075'], // Medium Brown
+  ['#4DD0E1', '#5FE0F3'], // Pale Cyan
+  ['#FFA726', '#FFB938'], // Light Orange
+  ['#7CB342', '#8EC354'], // Olive
+  ['#F06292', '#F274A4'], // Light Magenta
+  ['#90CAF9', '#A2DAFB'], // Pale Blue
+  ['#FF8A80', '#FF9C92'], // Light Salmon
+  ['#26A69A', '#38B6AA'], // Medium Sea Green
+  ['#EF9A9A', '#F1ACAC'], // Pale Red
+  ['#9FA8DA', '#B1BADA'], // Light Lavender
+  ['#FFCC80', '#FFDE92'], // Pale Amber
+  ['#66BB6A', '#78CB7C'], // Medium Green
+  ['#AB47BC', '#BD59CE'], // Soft Purple
+  ['#4FC3F7', '#61D3F9'], // Light Cyan
+  ['#FF8A65', '#FF9C77'],  // Soft Coral
+    ];
+
+    const hardColors = [
+      ['#D3D3D3', '#D6D6D6'], ['#4A4E69', '#4D5172'], ['#E5E5E5', '#E8E8E8'],
+      ['#2E2E2E', '#313131'], ['#F5F5F5', '#F7F7F7'], ['#DCDCDC', '#DFDFDF'],
+      ['#708090', '#728192'], ['#BC8F8F', '#BE9191'], ['#483D8B', '#4A3F8D'],
+      ['#B22222', '#B42424'], ['#191970', '#1B1B72'], ['#006400', '#026402'],
+      ['#4B0082', '#4D0084'], ['#2F4F4F', '#314F51'], ['#8B4513', '#8D4515'],
+      ['#556B2F', '#576D31'], ['#9932CC', '#9B34CE'], ['#8A2BE2', '#8C2DE4'],
+      ['#C71585', '#C91787'], ['#4682B4', '#4783B5'], ['#66CDAA', '#67CEAB'],
+      ['#FF4040', '#FF4141'], ['#4169E1', '#426AE2'], ['#32CD32', '#33CE33'],
+      ['#FF83FA', '#FF84FB'], ['#00FF00', '#01FF01'], ['#FF7F50', '#FF8051'],
+      ['#9400D3', '#9500D4'], ['#48D1CC', '#49D2CD'], ['#FF8C00', '#FF8D01'],
+      ['#00FA9A', '#01FB9B'], ['#DA70D6', '#DB71D7'], ['#FF4500', '#FF4601'],
+      ['#1E90FF', '#1F91FF'], ['#7CFC00', '#7DFD01'], ['#FF00FF', '#FF01FF'],
+      ['#00FF7F', '#01FF80'], ['#FFA07A', '#FFA17B'], ['#228B22', '#238C23'],
+      ['#FF3030', '#FF3131'],
+      ['#A9A9A9', '#ACACAC'], // Gray
+  ['#5D5D5D', '#606060'], // Dark Gray
+  ['#E0E0E0', '#E3E3E3'], // Light Gray
+  ['#3F3F3F', '#424242'], // Charcoal
+  ['#F0F0F0', '#F2F2F2'], // Very Light Gray
+  ['#D8D8D8', '#DBDBDB'], // Pale Gray
+  ['#6A8290', '#6D8593'], // Slate Gray
+  ['#B08080', '#B38383'], // Muted Red
+  ['#433A7F', '#463D82'], // Dark Blue
+  ['#A02020', '#A32323'], // Deep Red
+  ['#151563', '#171765'], // Navy Blue
+  ['#005A00', '#015C01'], // Dark Forest Green
+  ['#45007A', '#47007C'], // Deep Indigo
+  ['#2A4545', '#2C4747'], // Dark Teal
+  ['#82400D', '#84420F'], // Brown
+  ['#50652A', '#53672C'], // Olive Green
+  ['#8F2BBF', '#9130C1'], // Purple
+  ['#8129D8', '#832BDA'], // Violet
+  ['#B91478', '#BB167A'], // Magenta
+  ['#4178A8', '#437AA9'], // Steel Blue
+  ['#5FBFA0', '#60C0A1'], // Aquamarine
+  ['#E53939', '#E63B3B'], // Scarlet
+  ['#3C61D5', '#3E63D6'], // Blue
+  ['#2DBF2D', '#2EC02E'], // Green
+  ['#EF7BEF', '#F07CF0'], // Light Purple
+  ['#00E600', '#01E701'], // Bright Green
+  ['#E57448', '#E6764A'], // Coral
+  ['#8A00C9', '#8B01CA'], // Deep Purple
+  ['#43C7BB', '#44C8BC'], // Turquoise
+  ['#E58100', '#E68201'], // Orange
+  ['#00E48F', '#01E590'], // Spring Green
+  ['#CF68CB', '#D069CC'], // Light Purple
+  ['#E53F00', '#E64001'], // Red-Orange
+  ['#1A85E5', '#1B86E6'], // Bright Blue
+  ['#72E700', '#73E801'], // Lime Green
+  ['#E500E5', '#E601E6'], // Magenta
+  ['#00E572', '#01E673'], // Green
+  ['#EF9570', '#F09671'], // Salmon
+  ['#1F8121', '#208222'], // Dark Green
+  ['#E52A2A', '#E62B2B'], // Red
+  ['#B5B5B5', '#B8B8B8'], // Medium Gray
+  ['#656565', '#686868'], // Gray
+  ['#EAEAEA', '#EDEDED'], // Light Gray
+  ['#353535', '#383838'], // Dark Gray
+  ['#F8F8F8', '#FAFAFA'], // White
+  ['#E2E2E2', '#E5E5E5'], // Pale Gray
+  ['#758A9A', '#788D9D'], // Light Slate Gray
+  ['#C09090', '#C29393'], // Rosy Brown
+  ['#4D428F', '#50458F'], // Dark Blue
+  ['#B82828', '#BA2A2A'], // Red
+  ['#1C1A78', '#1E1C7A'], // Navy
+  ['#006A00', '#016C01'], // Green
+  ['#4F0086', '#510087'], // Indigo
+  ['#334D4D', '#354F4F'], // Teal
+  ['#8F4815', '#914A16'], // Brown
+  ['#59702F', '#5B7231'], // Olive
+  ['#9A37D0', '#9C39D2'], // Purple
+  ['#8E30E6', '#9032E8'], // Violet
+  ['#CB197F', '#CD1B81'], // Magenta
+  ['#4885B8', '#4A87BA'], // Blue
+  ['#68D0AC', '#69D1AD'], // Aquamarine
+  ['#FF4545', '#FF4646'], // Red
+  ['#4370E5', '#4572E7'], // Blue
+  ['#34D234', '#35D335'], // Green
+  ['#FF88FC', '#FF89FD'], // Light Magenta
+  ['#00FF05', '#01FF06'], // Green
+  ['#FF8455', '#FF8556'], // Coral
+  ['#9600D8', '#9700D9'], // Purple
+  ['#4AD2CF', '#4BD3D0'], // Turquoise
+  ['#FF9100', '#FF9201'], // Orange
+  ['#00FF9F', '#01FFA0'], // Green
+  ['#DC72D8', '#DD73D9'], // Purple
+  ['#FF4A00', '#FF4B01'], // Orange
+  ['#1F95FF', '#2096FF'], // Blue
+  ['#7FFF00', '#80FF01'], // Green
+  ['#FF00FF', '#FF01FF'], // Magenta
+  ['#00FF85', '#01FF86'], // Green
+  ['#FFA580', '#FFA681'], // Salmon
+  ['#239023', '#249124'], // Green
+  ['#FF3535', '#FF3636'], // Red
+  ['#C0C0C0', '#C3C3C3'], // Silver
+  ['#707070', '#737373'], // Gray
+  ['#EFEFEF', '#F2F2F2'], // Light Gray
+  ['#404040', '#434343'], // Dark Gray
+  ['#FAFAFA', '#FCFCFC'], // White
+  ['#E7E7E7', '#EAEAEA'], // Pale Gray
+  ['#7A909F', '#7D93A2'], // Slate Gray
+  ['#C59A9A', '#C79C9C'], // Light Red
+  ['#52478F', '#54498F'], // Blue
+  ['#BE2D2D', '#C02F2F'], // Red
+  ['#201F7F', '#22217F'], // Navy
+  ['#007000', '#017101'], // Green
+  ['#54008A', '#56008B'], // Indigo
+  ['#385252', '#3A5454'], // Teal
+  ['#944D17', '#964F18'], // Brown
+  ['#5E7533', '#607735'], // Olive
+  ['#9F3CD4', '#A13ED6'], // Purple
+  ['#9335EA', '#9537EC'], // Violet
+  ['#D01E83', '#D22085'], // Magenta
+  ['#4D8ABC', '#4F8CBE']  // Blue
+    ];
+
+    const veryHardColors = [
+      ['#F0F0F0', '#F2F2F2'], ['#404040', '#424242'], ['#E8E8E8', '#EAEAEA'],
+      ['#A0A0A0', '#A2A2A2'], ['#C0C0C0', '#C2C2C2'], ['#D8D8D8', '#DADADA'],
+      ['#787878', '#7A7A7A'], ['#B8B8B8', '#BABABA'], ['#585858', '#5A5A5A'],
+      ['#E0E0E0', '#E1E1E1'], ['#F4F4F4', '#F5F5F5'], ['#383838', '#3A3A3A'],
+      ['#C8C8C8', '#CACACA'], ['#484848', '#4A4A4A'], ['#D0D0D0', '#D2D2D2'],
+      ['#989898', '#9A9A9A'], ['#606060', '#626262'], ['#E4E4E4', '#E6E6E6'],
+      ['#A8A8A8', '#AAAAAA'], ['#707070', '#727272'], ['#F8F8F8', '#FAFAFA'],
+      ['#505050', '#525252'], ['#CCCCCC', '#CDCDCD'], ['#909090', '#929292'],
+      ['#686868', '#6A6A6A'], ['#DCDCDC', '#DEDEDE'], ['#B0B0B0', '#B2B2B2'],
+      ['#787878', '#797979'], ['#E8E8E8', '#E9E9E9'], ['#404040', '#414141'],
+      ['#F0F0F0', '#F1F1F1'], ['#A0A0A0', '#A1A1A1'], ['#C0C0C0', '#C1C1C1'],
+      ['#D8D8D8', '#D9D9D9'], ['#585858', '#595959'], ['#E0E0E0', '#E1E1E1'],
+      ['#F4F4F4', '#F5F5F5'], ['#383838', '#393939'], ['#C8C8C8', '#C9C9C9'],
+      ['#484848', '#494949'],  ['#EDEDED', '#EFEFEF'], // Very Light Gray
+  ['#454545', '#474747'], // Dark Gray
+  ['#E6E6E6', '#E8E8E8'], // Light Gray
+  ['#9D9D9D', '#9F9F9F'], // Gray
+  ['#BDBDBD', '#BFBFBF'], // Light Gray
+  ['#D5D5D5', '#D7D7D7'], // Light Gray
+  ['#757575', '#777777'], // Gray
+  ['#B5B5B5', '#B7B7B7'], // Light Gray
+  ['#555555', '#575757'], // Dark Gray
+  ['#DDDDDD', '#DFDFDF'], // Light Gray
+  ['#F1F1F1', '#F3F3F3'], // Very Light Gray
+  ['#353535', '#373737'], // Dark Gray
+  ['#C5C5C5', '#C7C7C7'], // Light Gray
+  ['#454545', '#474747'], // Dark Gray
+  ['#CDCDCD', '#CFCFCF'], // Light Gray
+  ['#959595', '#979797'], // Gray
+  ['#5D5D5D', '#5F5F5F'], // Dark Gray
+  ['#E1E1E1', '#E3E3E3'], // Light Gray
+  ['#A5A5A5', '#A7A7A7'], // Gray
+  ['#6D6D6D', '#6F6F6F'], // Gray
+  ['#F5F5F5', '#F7F7F7'], // Very Light Gray
+  ['#4D4D4D', '#4F4F4F'], // Dark Gray
+  ['#C9C9C9', '#CBCBCB'], // Light Gray
+  ['#8D8D8D', '#8F8F8F'], // Gray
+  ['#656565', '#676767'], // Dark Gray
+  ['#D9D9D9', '#DBDBDB'], // Light Gray
+  ['#ADADAD', '#AFAFAF'], // Gray
+  ['#757575', '#767676'], // Gray
+  ['#E5E5E5', '#E7E7E7'], // Light Gray
+  ['#3D3D3D', '#3F3F3F'], // Dark Gray
+  ['#EDEDED', '#EEEEEE'], // Very Light Gray
+  ['#9D9D9D', '#9E9E9E'], // Gray
+  ['#BBBBBB', '#BCBCBC'], // Light Gray
+  ['#D3D3D3', '#D5D5D5'], // Light Gray
+  ['#535353', '#555555'], // Dark Gray
+  ['#DBDBDB', '#DCDCDC'], // Light Gray
+  ['#F2F2F2', '#F4F4F4'], // Very Light Gray
+  ['#333333', '#353535'], // Dark Gray
+  ['#C3C3C3', '#C5C5C5'], // Light Gray
+  ['#434343', '#454545'], // Dark Gray
+  ['#CBCBCB', '#CDCDCD'], // Light Gray
+  ['#939393', '#959595'], // Gray
+  ['#5B5B5B', '#5D5D5D'], // Dark Gray
+  ['#DFDFDF', '#E1E1E1'], // Light Gray
+  ['#A3A3A3', '#A5A5A5'], // Gray
+  ['#6B6B6B', '#6D6D6D'], // Gray
+  ['#F3F3F3', '#F5F5F5'], // Very Light Gray
+  ['#4B4B4B', '#4D4D4D'], // Dark Gray
+  ['#C7C7C7', '#C9C9C9'], // Light Gray
+  ['#8B8B8B', '#8D8D8D'], // Gray
+  ['#636363', '#656565'], // Dark Gray
+  ['#D7D7D7', '#D9D9D9'], // Light Gray
+  ['#ABABAB', '#ADADAD'], // Gray
+  ['#737373', '#757575'], // Gray
+  ['#E3E3E3', '#E5E5E5'], // Light Gray
+  ['#3B3B3B', '#3D3D3D'], // Dark Gray
+  ['#EBEBEB', '#EDEDED'], // Very Light Gray
+  ['#9B9B9B', '#9D9D9D'], // Gray
+  ['#B9B9B9', '#BBBBBB'], // Light Gray
+  ['#D1D1D1', '#D3D3D3'], // Light Gray
+  ['#515151', '#535353'], // Dark Gray
+  ['#D9D9D9', '#DADADA'], // Light Gray
+  ['#F0F0F0', '#F2F2F2'], // Very Light Gray
+  ['#313131', '#333333'], // Dark Gray
+  ['#C1C1C1', '#C3C3C3'], // Light Gray
+  ['#414141', '#434343'], // Dark Gray
+  ['#C9C9C9', '#CBCBCB'], // Light Gray
+  ['#919191', '#939393'], // Gray
+  ['#595959', '#5B5B5B'], // Dark Gray
+  ['#DDDDDD', '#DFDFDF'], // Light Gray
+  ['#A1A1A1', '#A3A3A3'], // Gray
+  ['#696969', '#6B6B6B'], // Gray
+  ['#F1F1F1', '#F3F3F3'], // Very Light Gray
+  ['#494949', '#4B4B4B'], // Dark Gray
+  ['#C5C5C5', '#C7C7C7'], // Light Gray
+  ['#898989', '#8B8B8B'], // Gray
+  ['#616161', '#636363'], // Dark Gray
+  ['#D5D5D5', '#D7D7D7'], // Light Gray
+  ['#A9A9A9', '#ABABAB'], // Gray
+  ['#717171', '#737373'], // Gray
+  ['#E1E1E1', '#E3E3E3'], // Light Gray
+  ['#393939', '#3B3B3B'], // Dark Gray
+  ['#E9E9E9', '#EBEBEB'], // Very Light Gray
+  ['#999999', '#9B9B9B'], // Gray
+  ['#B7B7B7', '#B9B9B9'], // Light Gray
+  ['#CFCFCF', '#D1D1D1'], // Light Gray
+  ['#4F4F4F', '#515151'], // Dark Gray
+  ['#D7D7D7', '#D9D9D9'], // Light Gray
+  ['#EEEEEE', '#F0F0F0'], // Very Light Gray
+  ['#2F2F2F', '#313131'], // Dark Gray
+  ['#BFBFBF', '#C1C1C1'], // Light Gray
+  ['#3F3F3F', '#414141'], // Dark Gray
+  ['#C7C7C7', '#C9C9C9'], // Light Gray
+  ['#8F8F8F', '#919191'], // Gray
+  ['#575757', '#595959'], // Dark Gray
+  ['#DBDBDB', '#DDDDDD'], // Light Gray
+  ['#9F9F9F', '#A1A1A1'], // Gray
+  ['#676767', '#696969'], // Gray
+  ['#EFEFEF', '#F1F1F1'], // Very Light Gray
+  ['#474747', '#494949'], // Dark Gray
+  ['#C3C3C3', '#C5C5C5'], // Light Gray
+  ['#878787', '#898989']  // Gray
+    ];
+
+    const extremelyHardColors = [
+      ['#F0F0F0', '#F0F0F1'], ['#E0E0E0', '#E0E0E1'], ['#D0D0D0', '#D0D0D1'],
+      ['#C0C0C0', '#C0C0C1'], ['#B0B0B0', '#B0B0B1'], ['#A0A0A0', '#A0A0A1'],
+      ['#909090', '#909091'], ['#808080', '#808081'], ['#707070', '#707071'],
+      ['#606060', '#606061'], ['#505050', '#505051'], ['#404040', '#404041'],
+      ['#303030', '#303031'], ['#202020', '#202021'], ['#101010', '#101011'],
+      ['#F8F8F8', '#F8F8F9'], ['#F6F6F6', '#F6F6F7'], ['#F4F4F4', '#F4F4F5'],
+      ['#F2F2F2', '#F2F2F3'], ['#EEEEEE', '#EEEEEF'], ['#ECECEC', '#ECECED'],
+      ['#EAEAEA', '#EAEAEB'], ['#E8E8E8', '#E8E8E9'], ['#E6E6E6', '#E6E6E7'],
+      ['#E4E4E4', '#E4E4E5'], ['#E2E2E2', '#E2E2E3'], ['#E0E0E0', '#E0E0E1'],
+      ['#DEDEDE', '#DEDEDF'], ['#DCDCDC', '#DCDCDD'], ['#DADADA', '#DADADB'],
+      ['#D8D8D8', '#D8D8D9'], ['#D6D6D6', '#D6D6D7'], ['#D4D4D4', '#D4D4D5'],
+      ['#D2D2D2', '#D2D2D3'], ['#D0D0D0', '#D0D0D1'], ['#CECECE', '#CECECF'],
+      ['#CCCCCC', '#CCCCCD'], ['#CACACA', '#CACACB'], ['#C8C8C8', '#C8C8C9'],
+      ['#C6C6C6', '#C6C6C7'], ['#C4C4C4', '#C4C4C5'], // Light Gray
+  ['#C2C2C2', '#C2C2C3'], // Light Gray
+  ['#BEBEBE', '#BEBEBF'], // Light Gray
+  ['#BCBCBC', '#BCBCBD'], // Light Gray
+  ['#BABABA', '#BABABB'], // Light Gray
+  ['#B8B8B8', '#B8B8B9'], // Light Gray
+  ['#B6B6B6', '#B6B6B7'], // Light Gray
+  ['#B4B4B4', '#B4B4B5'], // Light Gray
+  ['#B2B2B2', '#B2B2B3'], // Light Gray
+  ['#AEAEAE', '#AEAEAF'], // Gray
+  ['#ACACAC', '#ACACAD'], // Gray
+  ['#AAAAAA', '#AAAAAB'], // Gray
+  ['#A8A8A8', '#A8A8A9'], // Gray
+  ['#A6A6A6', '#A6A6A7'], // Gray
+  ['#A4A4A4', '#A4A4A5'], // Gray
+  ['#A2A2A2', '#A2A2A3'], // Gray
+  ['#9E9E9E', '#9E9E9F'], // Gray
+  ['#9C9C9C', '#9C9C9D'], // Gray
+  ['#9A9A9A', '#9A9A9B'], // Gray
+  ['#989898', '#989899'], // Gray
+  ['#969696', '#969697'], // Gray
+  ['#949494', '#949495'], // Gray
+  ['#929292', '#929293'], // Gray
+  ['#8E8E8E', '#8E8E8F'], // Gray
+  ['#8C8C8C', '#8C8C8D'], // Gray
+  ['#8A8A8A', '#8A8A8B'], // Gray
+  ['#888888', '#888889'], // Gray
+  ['#868686', '#868687'], // Gray
+  ['#848484', '#848485'], // Gray
+  ['#828282', '#828283'], // Gray
+  ['#7E7E7E', '#7E7E7F'], // Gray
+  ['#7C7C7C', '#7C7C7D'], // Gray
+  ['#7A7A7A', '#7A7A7B'], // Gray
+  ['#787878', '#787879'], // Gray
+  ['#767676', '#767677'], // Gray
+  ['#747474', '#747475'], // Gray
+  ['#727272', '#727273'], // Gray
+  ['#6E6E6E', '#6E6E6F'], // Dark Gray
+  ['#6C6C6C', '#6C6C6D'], // Dark Gray
+  ['#6A6A6A', '#6A6A6B'], // Dark Gray
+  ['#686868', '#686869'], // Dark Gray
+  ['#666666', '#666667'], // Dark Gray
+  ['#646464', '#646465'], // Dark Gray
+  ['#626262', '#626263'], // Dark Gray
+  ['#5E5E5E', '#5E5E5F'], // Dark Gray
+  ['#5C5C5C', '#5C5C5D'], // Dark Gray
+  ['#5A5A5A', '#5A5A5B'], // Dark Gray
+  ['#585858', '#585859'], // Dark Gray
+  ['#565656', '#565657'], // Dark Gray
+  ['#545454', '#545455'], // Dark Gray
+  ['#525252', '#525253'], // Dark Gray
+  ['#4E4E4E', '#4E4E4F'], // Dark Gray
+  ['#4C4C4C', '#4C4C4D'], // Dark Gray
+  ['#4A4A4A', '#4A4A4B'], // Dark Gray
+  ['#484848', '#484849'], // Dark Gray
+  ['#464646', '#464647'], // Dark Gray
+  ['#444444', '#444445'], // Dark Gray
+  ['#424242', '#424243'], // Dark Gray
+  ['#3E3E3E', '#3E3E3F'], // Very Dark Gray
+  ['#3C3C3C', '#3C3C3D'], // Very Dark Gray
+  ['#3A3A3A', '#3A3A3B'], // Very Dark Gray
+  ['#383838', '#383839'], // Very Dark Gray
+  ['#363636', '#363637'], // Very Dark Gray
+  ['#343434', '#343435'], // Very Dark Gray
+  ['#323232', '#323233'], // Very Dark Gray
+  ['#2E2E2E', '#2E2E2F'], // Very Dark Gray
+  ['#2C2C2C', '#2C2C2D'], // Very Dark Gray
+  ['#2A2A2A', '#2A2A2B'], // Very Dark Gray
+  ['#282828', '#282829'], // Very Dark Gray
+  ['#262626', '#262627'], // Very Dark Gray
+  ['#242424', '#242425'], // Very Dark Gray
+  ['#222222', '#222223'], // Very Dark Gray
+  ['#1E1E1E', '#1E1E1F'], // Near Black
+  ['#1C1C1C', '#1C1C1D'], // Near Black
+  ['#1A1A1A', '#1A1A1B'], // Near Black
+  ['#181818', '#181819'], // Near Black
+  ['#161616', '#161617'], // Near Black
+  ['#141414', '#141415'], // Near Black
+  ['#121212', '#121213'], // Near Black
+  ['#0E0E0E', '#0E0E0F'], // Near Black
+  ['#0C0C0C', '#0C0C0D'], // Near Black
+  ['#0A0A0A', '#0A0A0B'], // Near Black
+  ['#080808', '#080809'], // Near Black
+  ['#060606', '#060607'], // Near Black
+  ['#040404', '#040405'], // Near Black
+  ['#020202', '#020203'], // Near Black
+  ['#FAFAFA', '#FAFAFB'], // Very Light Gray
+  ['#FCFCFC', '#FCFCFD'], // Very Light Gray
+  ['#FEFEFE', '#FEFEFF'], // Near White
+  ['#FDFDFD', '#FDFDFE'], // Near White
+  ['#FBFBFB', '#FBFBFC'], // Very Light Gray
+  ['#F9F9F9', '#F9F9FA'], // Very Light Gray
+  ['#F7F7F7', '#F7F7F8'], // Very Light Gray
+  ['#F5F5F5', '#F5F5F6'], // Very Light Gray
+  ['#F3F3F3', '#F3F3F4'], // Very Light Gray
+  ['#F1F1F1', '#F1F1F2'], // Very Light Gray
+  ['#EFEFEF', '#EFEFF0'], // Very Light Gray
+  ['#EDEDED', '#EDEDEE'], // Light Gray
+  ['#EBEBEB', '#EBEBEC'], // Light Gray
+  ['#E9E9E9', '#E9E9EA'], // Light Gray
+  ['#E7E7E7', '#E7E7E8'], // Light Gray
+  ['#E5E5E5', '#E5E5E6'], // Light Gray
+  ['#E3E3E3', '#E3E3E4'], // Light Gray
+  ['#E1E1E1', '#E1E1E2']  // Light Gray
+    ];
 
     startButton.addEventListener('click', startGame);
     restartButton.addEventListener('click', startGame);
@@ -315,8 +718,9 @@
       // Adjust grid size based on level
       if (level >= 5) gridSize = 4;
       if (level >= 8) gridSize = 5;
-      if (level >= 12) gridSize = 6;
-      if (level >= 15) gridSize = 7;
+      if (level >= 15) gridSize = 6;
+      if (level >= 30) gridSize = 7;
+      if (level >= 50) gridSize = 8;
 
       // Set grid columns and dynamic styling
       gameBoard.style.gridTemplateColumns = `repeat(${gridSize}, minmax(0, 1fr))`;
@@ -339,6 +743,10 @@
         tileSize = { width: '64px', height: '64px' };
         gap = '3px';
       }
+      else if (gridSize >= 8) {
+        tileSize = { width: '64px', height: '64px' };
+        gap = '3px';
+      }
 
       // Adjust for mobile (smaller tiles)
       if (window.innerWidth <= 640) {
@@ -356,6 +764,10 @@
           tileSize = { width: '32px', height: '32px' };
           gap = '2px';
         }
+        else if (gridSize >= 8) {
+          tileSize = { width: '32px', height: '32px' };
+          gap = '2px';
+        }
       }
 
       gameBoard.style.gap = gap;
@@ -367,8 +779,21 @@
       gameBoard.style.width = `${gridWidth}px`;
       gameBoard.style.margin = '0 auto';
 
-      // Select color pair (easier colors for levels 1-5)
-      const availableColors = level <= 5 ? colorPairs.slice(0, 16) : colorPairs;
+      // Select color array based on level
+      let availableColors;
+      if (level <= 20) { // Level 1-40: Dễ
+        availableColors = easyColors;
+      } else if (level <= 60) { // Level 41-80: Trung bình
+        availableColors = mediumColors;
+      } else if (level <= 100) { // Level 81-110: Khó
+        availableColors = hardColors;
+      } else if (level <= 139) { // Level 111-139: Rất khó
+        availableColors = veryHardColors;
+      } else { // Level 140+: Cực kỳ khó
+        availableColors = extremelyHardColors;
+      }
+
+      // Randomly pick a color pair from the selected array
       const colorPair = availableColors[Math.floor(Math.random() * availableColors.length)];
       const baseColor = colorPair[0];
       const differentColor = colorPair[1];
